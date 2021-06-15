@@ -1,9 +1,12 @@
-import { Controller, Get, Post, RequestMapping, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, RequestMapping, Res, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
+
   constructor(private readonly appService: AppService) {}
 
   @Get()
@@ -11,13 +14,27 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Post("/upload-file")
+  @Post("/upload-profile")
+  @UseInterceptors(FileInterceptor('file',{
+    storage: diskStorage({
+      destination: 'files',
+      filename: (req, file, cb) => {
+        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+        return cb(null, `${randomName}${extname(file.originalname)}`)
+      }
+    })
+  }))
+  async uploadedFile(@UploadedFile() file) {
+      const response = {
+        originalname: file.originalname,
+        filename: file.filename,
+      };
+      return response;
+  }
 
-  @UseInterceptors(FileInterceptor("file"))
+  uploadFile(@UploadedFile() file: Express.Multer.File,@Res() res ){
 
-  uploadFile(@UploadedFile() file: Express.Multer.File){
-
-    console.log("File uploaded: ",file);
+      res.sendFile
     
   }
 
@@ -45,8 +62,8 @@ export class AppController {
     {name: 'background',maxCount: 1}
   ]))
 
-  uploadFileDifferentField(){
-    
+  uploadFileDifferentField(@UploadedFiles() files){
+
   }
 
 }
