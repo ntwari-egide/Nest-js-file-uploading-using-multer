@@ -1,5 +1,5 @@
-import { Controller, Get, Post, RequestMapping, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Controller, Get, Post, RequestMapping, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { AppService } from './app.service';
 
 @Controller()
@@ -24,5 +24,14 @@ export class AppController {
   /**
    * uplooading multiple files
    */
+  @Post("/upload-multiple-file")
+
+  @UseInterceptors(FilesInterceptor("files"))
+
+  uploadMultipleFiles(@UploadedFiles() files: Array<Express.Multer.File>){
+    
+    console.log("Uploaded files: ",files);
+    
+  }
 
 }
