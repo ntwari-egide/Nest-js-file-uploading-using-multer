@@ -1,4 +1,4 @@
-import { Controller, Get, Post, RequestMapping, Res, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Param, Post, RequestMapping, Res, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -6,6 +6,9 @@ import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
+
+  SERVER_URL:  string  =  "http://localhost:3000/";
+
 
   constructor(private readonly appService: AppService) {}
 
@@ -30,6 +33,12 @@ export class AppController {
         filename: file.filename,
       };
       return response;
+  }
+
+
+ @Get('avatars/:fileId')
+  async serveAvatar(@Param('fileId') fileId, @Res() res): Promise<any> {
+    res.sendFile(fileId, { root: 'files'});
   }
 
   uploadFile(@UploadedFile() file: Express.Multer.File,@Res() res ){
